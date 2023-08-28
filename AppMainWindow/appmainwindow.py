@@ -9,3 +9,6 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
         self.setupUi(self)
+
+    def _init(self) -> None:
+        pass
