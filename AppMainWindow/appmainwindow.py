@@ -13,4 +13,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
     def _init(self) -> None:
+        self.browseBtn.clicked.connect(self.browseBtn_clicked)
+
+    def browseBtn_clicked(self) -> None:
         pass
