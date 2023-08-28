@@ -8,6 +8,8 @@ from .ui_form import Ui_MainWindow
 class AppMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
+
+        self._init()
         self.setupUi(self)
 
     def _init(self) -> None:
