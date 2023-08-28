@@ -9,8 +9,8 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
 
-        self._init()
         self.setupUi(self)
+        self._init()
 
     def _init(self) -> None:
         self.browseBtn.clicked.connect(self.browseBtn_clicked)
