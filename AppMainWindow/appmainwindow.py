@@ -8,9 +8,22 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 from PyQt6.QtCore import QFileInfo
+from PyQt6.QtGui import QImage, QPixmap
 from .ui_form import Ui_MainWindow
+from cv2 import Mat, imread
 from os import walk
 from os.path import join
+
+
+def cvMatToQImage(inMat: Mat) -> QImage:
+    height, width, channel = inMat.shape
+    bytesPerLine = 3 * width
+    qImg = QImage(inMat.data, width, height, bytesPerLine, QImage.Format.Format_RGB888)
+    return qImg.rgbSwapped()
+
+
+def cvMatToQPixmap(inMat: Mat) -> QPixmap:
+    return QPixmap.fromImage(cvMatToQImage(inMat))
 
 
 class AppMainWindow(QMainWindow, Ui_MainWindow):
@@ -67,6 +80,9 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                     if (not self.stopSearch and file.endswith(self.formats))
                 ]
             )
+
+        message = f"{len(self.pictures)} pictures have been found"
+        QMessageBox.information(self, "Search process", message)
 
     def stopBtn_clicked(self) -> None:
         self.stopSearch = True
