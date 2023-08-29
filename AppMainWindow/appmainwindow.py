@@ -1,7 +1,12 @@
 """
 pyuic6 -o AppMainWindow/ui_form.py "path/to/file.ui"
 """
-from PyQt6.QtWidgets import QMainWindow, QWidget, QFileDialog
+from PyQt6.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QFileDialog,
+    QMessageBox,
+)
 from PyQt6.QtCore import QFileInfo
 from .ui_form import Ui_MainWindow
 from os import walk
@@ -30,6 +35,20 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
     def _prepareFormats(self) -> None:
         formats = list()
+        if self.all.isChecked():
+            formats.extend(
+                [".jpeg", ".jpg", ".jpe", ".jp2", ".png", ".bmp", ".dib", ".webp"]
+            )
+        else:
+            if self.jpeg.isChecked():
+                formats.extend([".jpeg", ".jpg", ".jpe", ".jp2"])
+            if self.png.isChecked():
+                formats.extend([".png"])
+            if self.bmp.isChecked():
+                formats.extend([".bmp", ".dib"])
+            if self.webp.isChecked():
+                formats.extend([".webp"])
+        self.formats = tuple(formats)
 
     def startBtn_clicked(self) -> None:
         if not QFileInfo(self.searchDir.text()).isDir():
