@@ -13,32 +13,30 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
 
         self.stopSearch = False
+        self.formats = tuple()
         self.pictures = list()
 
         self.setupUi(self)
         self._init()
 
     def _init(self) -> None:
-        self.browseBtn.clicked.connect(self.browseBtn_clicked)
         self.searchBtn.clicked.connect(self.searchBtn_clicked)
         self.stopBtn.clicked.connect(self.stopBtn_clicked)
         self.showBtn.clicked.connect(self.showBtn_clicked)
+        self.browseBtn.clicked.connect(self.browseBtn_clicked)
         self.all.clicked.connect(self.all_clicked)
         self.jpeg.setChecked(True)
         self.png.setChecked(True)
 
-    def browseBtn_clicked(self) -> None:
-        _f = QFileDialog.getExistingDirectory(
-            self, "Choose a folder to start searching"
-        )
-        if QFileInfo(_f).isDir():
-            self.searchDir.setText(_f)
+    def _prepareFormats(self) -> None:
+        pass
 
     def searchBtn_clicked(self) -> None:
         if not QFileInfo(self.searchDir.text()).isDir():
             return
-        self.pictures.clear()
         self.stopSearch = False
+        self._prepareFormats()
+        self.pictures.clear()
 
         for root, dirs, files in walk(self.searchDir.text()):
             if self.stopSearch:
@@ -47,7 +45,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                 [
                     join(root, file)
                     for file in files
-                    if (not self.stopSearch and file.endswith((".py",)))
+                    if (not self.stopSearch and file.endswith(self.formats))
                 ]
             )
 
@@ -57,22 +55,23 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     def showBtn_clicked(self) -> None:
         print(self.pictures)
 
+    def browseBtn_clicked(self) -> None:
+        _f = QFileDialog.getExistingDirectory(
+            self, "Choose a folder to start searching"
+        )
+        if QFileInfo(_f).isDir():
+            self.searchDir.setText(_f)
+
     def all_clicked(self) -> None:
+        formats = [self.jpeg, self.png, self.bmp, self.webp]
         if self.all.isChecked():
-            self.jpeg.setChecked(True)
-            self.png.setChecked(True)
-            self.bmp.setChecked(True)
-            self.webp.setChecked(True)
-            self.jpeg.setEnabled(False)
-            self.png.setEnabled(False)
-            self.bmp.setEnabled(False)
-            self.webp.setEnabled(False)
+            for f in formats:
+                f.setChecked(True)
+                f.setEnabled(False)
         else:
             self.jpeg.setChecked(True)
             self.png.setChecked(True)
             self.bmp.setChecked(False)
             self.webp.setChecked(False)
-            self.jpeg.setEnabled(True)
-            self.png.setEnabled(True)
-            self.bmp.setEnabled(True)
-            self.webp.setEnabled(True)
+            for f in formats:
+                f.setEnabled(True)
