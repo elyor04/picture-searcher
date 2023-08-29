@@ -1,7 +1,8 @@
 """
 pyuic6 -o AppMainWindow/ui_form.py "path/to/file.ui"
 """
-from PyQt6.QtWidgets import QMainWindow, QWidget
+from PyQt6.QtWidgets import QMainWindow, QWidget, QFileDialog
+from PyQt6.QtCore import QFileInfo
 from .ui_form import Ui_MainWindow
 
 
@@ -19,7 +20,11 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.showBtn.clicked.connect(self.showBtn_clicked)
 
     def browseBtn_clicked(self) -> None:
-        pass
+        _f = QFileDialog.getExistingDirectory(
+            self, "Choose a folder to start searching"
+        )
+        if QFileInfo(_f).isDir():
+            self.searchDir.setText(_f)
 
     def searchBtn_clicked(self) -> None:
         pass
