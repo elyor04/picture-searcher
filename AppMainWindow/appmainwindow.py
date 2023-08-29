@@ -2,10 +2,10 @@
 pyuic6 -o AppMainWindow/ui_form.py "path/to/file.ui"
 """
 from PyQt6.QtWidgets import QMainWindow, QWidget, QFileDialog, QMessageBox, QLabel
-from PyQt6.QtCore import QFileInfo
-from PyQt6.QtGui import QImage, QPixmap, QMouseEvent
+from PyQt6.QtCore import QFileInfo, Qt
+from PyQt6.QtGui import QImage, QPixmap, QMouseEvent, QResizeEvent
 from .ui_form import Ui_MainWindow
-from cv2 import Mat, imread, resize, INTER_AREA
+from cv2 import Mat, imread, resize, INTER_AREA, INTER_LINEAR
 from os import walk
 from os.path import join
 
@@ -24,21 +24,42 @@ def cvMatToQPixmap(inMat: Mat) -> QPixmap:
 class PictureLabel(QLabel):
     def __init__(self, pictures: list[str] = None) -> None:
         super().__init__()
+        self.resize(500, 500)
         self.loadPictures(pictures)
-        self.setText("")
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._img = None
 
     def loadPictures(self, pictures: list[str]) -> None:
         self.pictures = pictures
         self.pic_n = 0
 
+    def _resize(self, img: Mat, limitSize: tuple[int, int]) -> Mat:
+        imgHg, imgWd = img.shape[:2]
+        k = imgWd / imgHg
+
+        if limitSize[0] > limitSize[1]:
+            newWd, newHg = int(limitSize[1] * k), limitSize[1]
+        else:
+            newWd, newHg = limitSize[0], int(limitSize[0] / k)
+
+        if (newWd * newHg) <= (imgWd * imgHg):
+            return resize(img, (newWd, newHg), interpolation=INTER_AREA)
+        else:
+            return resize(img, (newWd, newHg), interpolation=INTER_LINEAR)
+
     def drawPicture(self) -> None:
-        img = imread(self.pictures[self.pic_n])
-        self.resize(img.shape[1], img.shape[0])
+        self._img = imread(self.pictures[self.pic_n])
+        img = self._resize(self._img, (self.width(), self.height()))
         self.setPixmap(cvMatToQPixmap(img))
         self.setWindowTitle(f"Picture-{self.pic_n + 1}")
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        isNext = event.pos().x() > (self.width() / 2)
+    def resizeEvent(self, ev: QResizeEvent) -> None:
+        size = ev.size()
+        img = self._resize(self._img, (size.width(), size.height()))
+        self.setPixmap(cvMatToQPixmap(img))
+
+    def mouseReleaseEvent(self, ev: QMouseEvent) -> None:
+        isNext = ev.pos().x() > (self.width() / 2)
         if isNext:
             if (self.pic_n + 1) < len(self.pictures):
                 self.pic_n += 1
@@ -50,12 +71,6 @@ class PictureLabel(QLabel):
             else:
                 self.pic_n = len(self.pictures) - 1
         self.drawPicture()
-
-    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
-        if self.isFullScreen():
-            self.showNormal()
-        else:
-            self.showFullScreen()
 
 
 class AppMainWindow(QMainWindow, Ui_MainWindow):
