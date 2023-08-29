@@ -20,7 +20,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self._init()
 
     def _init(self) -> None:
-        self.searchBtn.clicked.connect(self.searchBtn_clicked)
+        self.startBtn.clicked.connect(self.startBtn_clicked)
         self.stopBtn.clicked.connect(self.stopBtn_clicked)
         self.showBtn.clicked.connect(self.showBtn_clicked)
         self.browseBtn.clicked.connect(self.browseBtn_clicked)
@@ -29,9 +29,9 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.png.setChecked(True)
 
     def _prepareFormats(self) -> None:
-        pass
+        formats = list()
 
-    def searchBtn_clicked(self) -> None:
+    def startBtn_clicked(self) -> None:
         if not QFileInfo(self.searchDir.text()).isDir():
             return
         self.stopSearch = False
