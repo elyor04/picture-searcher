@@ -23,6 +23,9 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.searchBtn.clicked.connect(self.searchBtn_clicked)
         self.stopBtn.clicked.connect(self.stopBtn_clicked)
         self.showBtn.clicked.connect(self.showBtn_clicked)
+        self.all.clicked.connect(self.all_clicked)
+        self.jpeg.setChecked(True)
+        self.png.setChecked(True)
 
     def browseBtn_clicked(self) -> None:
         _f = QFileDialog.getExistingDirectory(
@@ -53,3 +56,23 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
     def showBtn_clicked(self) -> None:
         print(self.pictures)
+
+    def all_clicked(self) -> None:
+        if self.all.isChecked():
+            self.jpeg.setChecked(True)
+            self.png.setChecked(True)
+            self.bmp.setChecked(True)
+            self.webp.setChecked(True)
+            self.jpeg.setEnabled(False)
+            self.png.setEnabled(False)
+            self.bmp.setEnabled(False)
+            self.webp.setEnabled(False)
+        else:
+            self.jpeg.setChecked(True)
+            self.png.setChecked(True)
+            self.bmp.setChecked(False)
+            self.webp.setChecked(False)
+            self.jpeg.setEnabled(True)
+            self.png.setEnabled(True)
+            self.bmp.setEnabled(True)
+            self.webp.setEnabled(True)
