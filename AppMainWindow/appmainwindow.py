@@ -48,10 +48,8 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                 ]
             )
 
-        print(self.pictures)
-
     def stopBtn_clicked(self) -> None:
-        pass
+        self.stopSearch = True
 
     def showBtn_clicked(self) -> None:
-        pass
+        print(self.pictures)
