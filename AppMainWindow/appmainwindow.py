@@ -35,15 +35,20 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         if not QFileInfo(self.searchDir.text()).isDir():
             return
         self.pictures.clear()
+        self.stopSearch = False
+
         for root, dirs, files in walk(self.searchDir.text()):
             if self.stopSearch:
                 break
-            self.pictures.extend([
-                join(root, file)
-                for file in files
-                if (not self.stopSearch and file.endswith((".py",)))
-            ])
-        self.stopSearch = False
+            self.pictures.extend(
+                [
+                    join(root, file)
+                    for file in files
+                    if (not self.stopSearch and file.endswith((".py",)))
+                ]
+            )
+
+        print(self.pictures)
 
     def stopBtn_clicked(self) -> None:
         pass
