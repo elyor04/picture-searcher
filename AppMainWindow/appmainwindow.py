@@ -3,7 +3,7 @@ pyuic6 -o AppMainWindow/ui_form.py "path/to/file.ui"
 """
 from PyQt6.QtWidgets import QMainWindow, QWidget, QFileDialog, QMessageBox, QLabel
 from PyQt6.QtCore import QFileInfo, Qt
-from PyQt6.QtGui import QImage, QPixmap, QMouseEvent, QResizeEvent
+from PyQt6.QtGui import QImage, QPixmap, QMouseEvent, QResizeEvent, QKeyEvent
 from .ui_form import Ui_MainWindow
 from cv2 import Mat, imread, resize, INTER_AREA, INTER_LINEAR
 from os import walk
@@ -53,24 +53,36 @@ class PictureLabel(QLabel):
         self.setPixmap(cvMatToQPixmap(img))
         self.setWindowTitle(f"Picture-{self.pic_n + 1}")
 
+    def nextPicture(self) -> None:
+        if (self.pic_n + 1) < len(self.pictures):
+            self.pic_n += 1
+        else:
+            self.pic_n = 0
+        self.drawPicture()
+
+    def prevPicture(self) -> None:
+        if (self.pic_n - 1) > -1:
+            self.pic_n -= 1
+        else:
+            self.pic_n = len(self.pictures) - 1
+        self.drawPicture()
+
     def resizeEvent(self, ev: QResizeEvent) -> None:
         size = ev.size()
         img = self._resize(self._img, (size.width(), size.height()))
         self.setPixmap(cvMatToQPixmap(img))
 
     def mouseReleaseEvent(self, ev: QMouseEvent) -> None:
-        isNext = ev.pos().x() > (self.width() / 2)
-        if isNext:
-            if (self.pic_n + 1) < len(self.pictures):
-                self.pic_n += 1
-            else:
-                self.pic_n = 0
+        if ev.pos().x() > (self.width() / 2):
+            self.nextPicture()
         else:
-            if (self.pic_n - 1) > -1:
-                self.pic_n -= 1
-            else:
-                self.pic_n = len(self.pictures) - 1
-        self.drawPicture()
+            self.prevPicture()
+
+    def keyPressEvent(self, ev: QKeyEvent) -> None:
+        if ev.key() == Qt.Key.Key_Right:
+            self.nextPicture()
+        elif ev.key() == Qt.Key.Key_Left:
+            self.prevPicture()
 
 
 class AppMainWindow(QMainWindow, Ui_MainWindow):
