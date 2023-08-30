@@ -52,8 +52,9 @@ class PictureLabel(QLabel):
         if not self.pictures:
             return False
         self._img = imread(self.pictures[self.pic_n])
-        img = self._resize(self._img, (self.width(), self.height()))
-        self.setPixmap(cvMatToQPixmap(img))
+        if self._img is not None:
+            img = self._resize(self._img, (self.width(), self.height()))
+            self.setPixmap(cvMatToQPixmap(img))
         self.setWindowTitle(f"Picture-{self.pic_n + 1}")
         return True
 
