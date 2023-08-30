@@ -28,7 +28,7 @@ class PictureLabel(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def loadPictures(self, pictures: list[str]) -> None:
-        self.resize(500, 500)
+        self.resize(600, 500)
         self.pictures = pictures
         self.pic_n = 0
         self._img = None
