@@ -93,7 +93,6 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
 
-        self.stopSearch = False
         self.formats = tuple()
         self.picLabel = PictureLabel()
 
@@ -101,8 +100,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self._init()
 
     def _init(self) -> None:
-        self.startBtn.clicked.connect(self.startBtn_clicked)
-        self.stopBtn.clicked.connect(self.stopBtn_clicked)
+        self.searchBtn.clicked.connect(self.searchBtn_clicked)
         self.showBtn.clicked.connect(self.showBtn_clicked)
         self.browseBtn.clicked.connect(self.browseBtn_clicked)
         self.all.clicked.connect(self.all_clicked)
@@ -126,34 +124,24 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                 formats.extend([".webp"])
         self.formats = tuple(formats)
 
-    def startBtn_clicked(self) -> None:
+    def searchBtn_clicked(self) -> None:
         if not QFileInfo(self.searchDir.text()).isDir():
             return
-        self.stopSearch = False
         self._prepareFormats()
 
         pictures = list()
         for root, dirs, files in walk(self.searchDir.text()):
-            if self.stopSearch:
-                break
             pictures.extend(
-                [
-                    join(root, file)
-                    for file in files
-                    if (not self.stopSearch and file.endswith(self.formats))
-                ]
+                [join(root, file) for file in files if file.endswith(self.formats)]
             )
         self.picLabel.loadPictures(pictures)
 
         message = f"{len(pictures)} pictures have been found"
         QMessageBox.information(self, "Search process", message)
 
-    def stopBtn_clicked(self) -> None:
-        self.stopSearch = True
-
     def showBtn_clicked(self) -> None:
         if self.picLabel.drawPicture():
-            self.picLabel.showNormal()
+            self.picLabel.showMaximized()
         else:
             QMessageBox.warning(self, "Show process", "Nothing to show")
 
