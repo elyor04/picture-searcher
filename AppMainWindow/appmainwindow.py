@@ -8,6 +8,7 @@ from .ui_form import Ui_MainWindow
 from cv2 import Mat, imread, resize, INTER_AREA, INTER_LINEAR
 from os import walk
 from os.path import join
+from time import time
 
 
 def cvMatToQImage(inMat: Mat) -> QImage:
@@ -103,41 +104,47 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.searchBtn.clicked.connect(self.searchBtn_clicked)
         self.showBtn.clicked.connect(self.showBtn_clicked)
         self.browseBtn.clicked.connect(self.browseBtn_clicked)
-        self.all.clicked.connect(self.all_clicked)
         self.jpeg.setChecked(True)
         self.png.setChecked(True)
 
     def _prepareFormats(self) -> None:
         formats = list()
-        if self.all.isChecked():
-            formats.extend(
-                [".jpeg", ".jpg", ".jpe", ".jp2", ".png", ".bmp", ".dib", ".webp"]
-            )
-        else:
-            if self.jpeg.isChecked():
-                formats.extend([".jpeg", ".jpg", ".jpe", ".jp2"])
-            if self.png.isChecked():
-                formats.extend([".png"])
-            if self.bmp.isChecked():
-                formats.extend([".bmp", ".dib"])
-            if self.webp.isChecked():
-                formats.extend([".webp"])
+        if self.jpeg.isChecked():
+            formats.extend([".jpeg", ".jpg", ".jpe", ".jp2"])
+        if self.png.isChecked():
+            formats.extend([".png"])
+        if self.bmp.isChecked():
+            formats.extend([".bmp", ".dib"])
+        if self.webp.isChecked():
+            formats.extend([".webp"])
+        if self.ect.isChecked():
+            formats.extend([
+                ".pbm", ".pgm", ".ppm", ".pxm", ".pnm",
+                ".sr", ".ras",
+                ".tiff", ".tif",
+                ".hdr", ".pic",
+            ])
         self.formats = tuple(formats)
 
     def searchBtn_clicked(self) -> None:
         if not QFileInfo(self.searchDir.text()).isDir():
             return
         self._prepareFormats()
-
         pictures = list()
+
+        _tm = time()
         for root, dirs, files in walk(self.searchDir.text()):
             pictures.extend(
                 [join(root, file) for file in files if file.endswith(self.formats)]
             )
-        self.picLabel.loadPictures(pictures)
+        _tm = time() - _tm
 
-        message = f"{len(pictures)} pictures have been found"
-        QMessageBox.information(self, "Search process", message)
+        self.picLabel.loadPictures(pictures)
+        QMessageBox.information(
+            self,
+            "Search process",
+            f"Found pictures: {len(pictures)}\nSpent time: {round(_tm)} second(s)",
+        )
 
     def showBtn_clicked(self) -> None:
         if self.picLabel.drawPicture():
@@ -151,17 +158,3 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         )
         if QFileInfo(_f).isDir():
             self.searchDir.setText(_f)
-
-    def all_clicked(self) -> None:
-        formats = [self.jpeg, self.png, self.bmp, self.webp]
-        if self.all.isChecked():
-            for f in formats:
-                f.setChecked(True)
-                f.setEnabled(False)
-        else:
-            self.jpeg.setChecked(True)
-            self.png.setChecked(True)
-            self.bmp.setChecked(False)
-            self.webp.setChecked(False)
-            for f in formats:
-                f.setEnabled(True)
