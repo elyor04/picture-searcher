@@ -129,6 +129,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
     def searchBtn_clicked(self) -> None:
         if not QFileInfo(self.searchDir.text()).isDir():
+            QMessageBox.warning(self, "Search process", "Invalid folder")
             return
         self._prepareFormats()
         pictures = list()
