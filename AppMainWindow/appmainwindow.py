@@ -26,11 +26,11 @@ class PictureLabel(QLabel):
         super().__init__()
         self.loadPictures(pictures)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._img = None
 
     def loadPictures(self, pictures: list[str]) -> None:
         self.pictures = pictures
         self.pic_n = 0
+        self._img = None
 
     def _resize(self, img: Mat, limitSize: tuple[int, int]) -> Mat:
         imgHg, imgWd = img.shape[:2]
@@ -46,27 +46,32 @@ class PictureLabel(QLabel):
         else:
             return resize(img, (newWd, newHg), interpolation=INTER_LINEAR)
 
-    def drawPicture(self) -> None:
+    def drawPicture(self) -> bool:
+        if not self.pictures:
+            return False
         self._img = imread(self.pictures[self.pic_n])
         img = self._resize(self._img, (self.width(), self.height()))
         self.setPixmap(cvMatToQPixmap(img))
         self.setWindowTitle(f"Picture-{self.pic_n + 1}")
+        return True
 
-    def nextPicture(self) -> None:
+    def nextPicture(self) -> bool:
         if (self.pic_n + 1) < len(self.pictures):
             self.pic_n += 1
         else:
             self.pic_n = 0
-        self.drawPicture()
+        return self.drawPicture()
 
-    def prevPicture(self) -> None:
+    def prevPicture(self) -> bool:
         if (self.pic_n - 1) > -1:
             self.pic_n -= 1
         else:
             self.pic_n = len(self.pictures) - 1
-        self.drawPicture()
+        return self.drawPicture()
 
     def resizeEvent(self, ev: QResizeEvent) -> None:
+        if self._img is not None:
+            return
         img = self._resize(self._img, (self.width(), self.height()))
         self.setPixmap(cvMatToQPixmap(img))
 
@@ -146,8 +151,10 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.stopSearch = True
 
     def showBtn_clicked(self) -> None:
-        self.picLabel.drawPicture()
-        self.picLabel.showNormal()
+        if self.picLabel.drawPicture():
+            self.picLabel.showNormal()
+        else:
+            QMessageBox.warning(self, "Show process", "Nothing to show")
 
     def browseBtn_clicked(self) -> None:
         _f = QFileDialog.getExistingDirectory(
