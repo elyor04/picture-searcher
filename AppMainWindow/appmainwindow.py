@@ -70,7 +70,7 @@ class PictureLabel(QLabel):
         return self.drawPicture()
 
     def resizeEvent(self, ev: QResizeEvent) -> None:
-        if self._img is not None:
+        if self._img is None:
             return
         img = self._resize(self._img, (self.width(), self.height()))
         self.setPixmap(cvMatToQPixmap(img))
