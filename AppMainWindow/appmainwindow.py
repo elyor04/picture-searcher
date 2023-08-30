@@ -38,9 +38,9 @@ class PictureLabel(QLabel):
         k = imgWd / imgHg
 
         if limitSize[0] > limitSize[1]:
-            newWd, newHg = int(limitSize[1] * k), limitSize[1]
+            newWd, newHg = round(limitSize[1] * k), limitSize[1]
         else:
-            newWd, newHg = limitSize[0], int(limitSize[0] / k)
+            newWd, newHg = limitSize[0], round(limitSize[0] / k)
 
         if (newWd * newHg) <= (imgWd * imgHg):
             return resize(img, (newWd, newHg), interpolation=INTER_AREA)
