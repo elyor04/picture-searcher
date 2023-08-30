@@ -24,7 +24,6 @@ def cvMatToQPixmap(inMat: Mat) -> QPixmap:
 class PictureLabel(QLabel):
     def __init__(self, pictures: list[str] = None) -> None:
         super().__init__()
-        self.resize(500, 500)
         self.loadPictures(pictures)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._img = None
@@ -68,8 +67,7 @@ class PictureLabel(QLabel):
         self.drawPicture()
 
     def resizeEvent(self, ev: QResizeEvent) -> None:
-        size = ev.size()
-        img = self._resize(self._img, (size.width(), size.height()))
+        img = self._resize(self._img, (self.width(), self.height()))
         self.setPixmap(cvMatToQPixmap(img))
 
     def mouseReleaseEvent(self, ev: QMouseEvent) -> None:
