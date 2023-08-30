@@ -34,19 +34,19 @@ class PictureLabel(QLabel):
         self.pic_n = 0
         self._img = None
 
-    def _resize(self, img: Mat, limitSize: tuple[int, int]) -> Mat:
-        imgHg, imgWd = img.shape[:2]
-        k = imgWd / imgHg
+    def _resize(self, img: Mat, screenSize: tuple[int, int]) -> Mat:
+        hi, wi = img.shape[:2]
+        ws, hs = screenSize
+        ri, rs = wi / hi, ws / hs
 
-        if limitSize[0] > limitSize[1]:
-            newWd, newHg = round(limitSize[1] * k), limitSize[1]
-        else:
-            newWd, newHg = limitSize[0], round(limitSize[0] / k)
+        wn = int(wi * hs / hi) if (rs > ri) else ws
+        hn = hs if (rs > ri) else int(hi * ws / wi)
+        wn, hn = max(wn, 1), max(hn, 1)
 
-        if (newWd * newHg) < (imgWd * imgHg):
-            return resize(img, (newWd, newHg), interpolation=INTER_AREA)
+        if (wn * hn) < (wi * hi):
+            return resize(img, (wn, hn), interpolation=INTER_AREA)
         else:
-            return resize(img, (newWd, newHg), interpolation=INTER_LINEAR)
+            return resize(img, (wn, hn), interpolation=INTER_LINEAR)
 
     def drawPicture(self) -> bool:
         if not self.pictures:
@@ -150,7 +150,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
     def showBtn_clicked(self) -> None:
         if self.picLabel.drawPicture():
-            self.picLabel.showMaximized()
+            self.picLabel.showNormal()
         else:
             QMessageBox.warning(self, "Show process", "Nothing to show")
 
