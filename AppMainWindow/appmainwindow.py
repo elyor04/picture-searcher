@@ -125,8 +125,8 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             return
         self.stopSearch = False
         self._prepareFormats()
-        pictures = list()
 
+        pictures = list()
         for root, dirs, files in walk(self.searchDir.text()):
             if self.stopSearch:
                 break
