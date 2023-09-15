@@ -11,5 +11,5 @@
 
 ## Install
 ```
-pip install --upgrade opencv-python PyQt6
+pip install opencv-python PyQt6
 ```
