@@ -1,3 +1,6 @@
+"""
+pyinstaller main.py --onefile --windowed --name="Picture Searcher" --icon="resources/search-icon.png"
+"""
 from PyQt6.QtWidgets import QApplication
 from AppMainWindow import AppMainWindow
 import sys
